@@ -1,42 +1,50 @@
 const pool = require('../config/db');
 
-const Usuarios = {
-  async getAll() {
-    const result = await pool.query('SELECT * FROM usuarios');
-    return result.rows;
-  },
+// Crear usuario
+async function createUsuario({ nombre, email, rol, estado, deportes_notificaciones }) {
+  const result = await pool.query(
+    `INSERT INTO usuarios (nombre, email, rol, estado, deportes_notificaciones)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING *`,
+    [nombre, email, rol, estado, deportes_notificaciones]
+  );
+  return result.rows[0];
+}
 
-  async getById(id) {
-    const result = await pool.query('SELECT * FROM usuarios WHERE id = $1', [id]);
-    return result.rows[0];
-  },
+// Obtener todos los usuarios
+async function getUsuarios() {
+  const result = await pool.query('SELECT * FROM usuarios');
+  return result.rows;
+}
 
-  async create({ nombre, email, password, rol, telefono, posicion, deporte_preferido }) {
-    const result = await pool.query(
-      `INSERT INTO usuarios (nombre, email, password, rol, telefono, posicion, deporte_preferido)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [nombre, email, password, rol || 'jugador', telefono || null, posicion || null, deporte_preferido || null]
-    );
-    return result.rows[0];
-  },
+// Obtener usuario por ID
+async function getUsuarioById(id) {
+  const result = await pool.query('SELECT * FROM usuarios WHERE id = $1', [id]);
+  return result.rows[0];
+}
 
-  async update(id, { nombre, email, rol, telefono, posicion, deporte_preferido, estado }) {
-    const result = await pool.query(
-      `UPDATE usuarios
-       SET nombre = $1, email = $2, rol = $3, telefono = $4, posicion = $5, deporte_preferido = $6, estado = $7
-       WHERE id = $8 RETURNING *`,
-      [nombre, email, rol, telefono, posicion, deporte_preferido, estado, id]
-    );
-    return result.rows[0];
-  },
+// Actualizar usuario
+async function updateUsuario(id, { nombre, email, rol, estado, deportes_notificaciones }) {
+  const result = await pool.query(
+    `UPDATE usuarios
+     SET nombre = $1, email = $2, rol = $3, estado = $4, deportes_notificaciones = $5
+     WHERE id = $6
+     RETURNING *`,
+    [nombre, email, rol, estado, deportes_notificaciones, id]
+  );
+  return result.rows[0];
+}
 
-  async delete(id) {
-    const result = await pool.query(
-      `DELETE FROM usuarios WHERE id = $1 RETURNING *`,
-      [id]
-    );
-    return result.rows[0];
-  }
+// Eliminar usuario
+async function deleteUsuario(id) {
+  const result = await pool.query('DELETE FROM usuarios WHERE id = $1 RETURNING *', [id]);
+  return result.rows[0];
+}
+
+module.exports = {
+  createUsuario,
+  getUsuarios,
+  getUsuarioById,
+  updateUsuario,
+  deleteUsuario
 };
-
-module.exports = Usuarios;

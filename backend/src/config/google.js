@@ -1,6 +1,6 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const Usuarios = require('../models/usuarios'); // importa tu módulo
+const pool = require('./db');
 
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
@@ -8,17 +8,19 @@ passport.use(new GoogleStrategy({
   callbackURL: "/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-    // Buscar usuario por email
-    const todos = await Usuarios.getAll();
-    let usuario = todos.find(u => u.google_id === profile.id || u.email === profile.emails[0].value);
+    const result = await pool.query(
+      'SELECT * FROM usuarios WHERE google_id = $1 OR email = $2',
+      [profile.id, profile.emails[0].value]
+    );
+    let usuario = result.rows[0];
 
     if (!usuario) {
-      // Crear nuevo usuario si no existe
-      usuario = await Usuarios.create({
-        nombre: profile.displayName,
-        email: profile.emails[0].value,
-        rol: 'jugador'
-      });
+      const insert = await pool.query(
+        `INSERT INTO usuarios (google_id, nombre, email, rol)
+         VALUES ($1, $2, $3, $4) RETURNING *`,
+        [profile.id, profile.displayName, profile.emails[0].value, 'jugador']
+      );
+      usuario = insert.rows[0];
     }
 
     return done(null, usuario);
@@ -33,9 +35,9 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const todos = await Usuarios.getAll();
-    const usuario = todos.find(u => u.id === id);
-    done(null, usuario);
+    const result = await pool.query('SELECT * FROM usuarios WHERE id = $1', [id]);
+    const usuario = result.rows[0];
+    done(null, usuario); // rol actualizado
   } catch (err) {
     done(err, null);
   }
