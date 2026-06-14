@@ -9,8 +9,13 @@ const passport = require('./src/config/google');
 const errorHandler = require('./src/middlewares/errorHandler');
 
 const routes = require('./src/routes/index'); // NUEVO
+const { swaggerUi, specs } = require('./src/config/swagger');
 
+// Inicializar la app ANTES de usarla
 const app = express();
+
+// Swagger (documentación)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Seguridad básica
 app.use(cors());
@@ -30,13 +35,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Rutas centralizadas
-app.use('/', routes);
+app.use('/api', routes);
 
 // Middleware de errores
 app.use(errorHandler);
 
 // Puerto
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

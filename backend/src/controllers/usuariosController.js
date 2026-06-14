@@ -5,7 +5,8 @@ exports.getUsuarios = async (req, res) => {
     const usuarios = await Usuarios.getAll();
     res.json(usuarios);
   } catch (err) {
-    res.status(500).json({ error: 'Error al obtener usuarios' });
+    console.error('Error al obtener usuarios:', err.message);
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -15,7 +16,8 @@ exports.getUsuarioById = async (req, res) => {
     if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
     res.json(usuario);
   } catch (err) {
-    res.status(500).json({ error: 'Error al obtener usuario' });
+    console.error('Error al obtener usuario:', err.message);
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -24,7 +26,8 @@ exports.createUsuario = async (req, res) => {
     const nuevo = await Usuarios.create(req.body);
     res.status(201).json(nuevo);
   } catch (err) {
-    res.status(500).json({ error: 'Error al crear usuario' });
+    console.error('Error al crear usuario:', err.message);
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -34,7 +37,8 @@ exports.updateUsuario = async (req, res) => {
     if (!actualizado) return res.status(404).json({ error: 'Usuario no encontrado' });
     res.json(actualizado);
   } catch (err) {
-    res.status(500).json({ error: 'Error al actualizar usuario' });
+    console.error('Error al actualizar usuario:', err.message);
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -44,6 +48,7 @@ exports.deleteUsuario = async (req, res) => {
     if (!eliminado) return res.status(404).json({ error: 'Usuario no encontrado' });
     res.json({ mensaje: 'Usuario eliminado', eliminado });
   } catch (err) {
-    res.status(500).json({ error: 'Error al eliminar usuario' });
+    console.error('Error al eliminar usuario:', err.message);
+    res.status(500).json({ error: err.message });
   }
 };

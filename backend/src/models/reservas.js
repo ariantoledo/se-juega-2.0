@@ -12,20 +12,28 @@ const Reservas = {
   },
 
   async create({ usuario_id, establecimiento_id, fecha, hora, estado }) {
+    const estadosValidos = ['pendiente', 'confirmada', 'cancelada'];
+    const estadoFinal = estadosValidos.includes(estado) ? estado : 'pendiente';
+
     const result = await pool.query(
       `INSERT INTO reservas (usuario_id, establecimiento_id, fecha, hora, estado)
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [usuario_id, establecimiento_id, fecha, hora, estado || 'pendiente']
+      [usuario_id, establecimiento_id, fecha, hora, estadoFinal]
     );
     return result.rows[0];
   },
 
-  async update(id, { fecha, hora, estado }) {
+  async update(id, { usuario_id, establecimiento_id, fecha, hora, estado }) {
+    const estadosValidos = ['pendiente', 'confirmada', 'cancelada'];
+    if (estado && !estadosValidos.includes(estado)) {
+      throw new Error('Estado inválido');
+    }
+
     const result = await pool.query(
       `UPDATE reservas
-       SET fecha = $1, hora = $2, estado = $3
-       WHERE id = $4 RETURNING *`,
-      [fecha, hora, estado, id]
+       SET usuario_id = $1, establecimiento_id = $2, fecha = $3, hora = $4, estado = $5
+       WHERE id = $6 RETURNING *`,
+      [usuario_id, establecimiento_id, fecha, hora, estado, id]
     );
     return result.rows[0];
   },
