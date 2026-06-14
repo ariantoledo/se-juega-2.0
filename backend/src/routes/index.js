@@ -23,7 +23,7 @@ router.use('/reservas', ensureAuthenticated, validateReserva, reservasRoutes);
 router.use('/partidos', ensureAuthenticated, partidosRoutes);
 router.use('/pagos', ensureAuthenticated, pagosRoutes);
 router.use('/estadisticas', ensureAuthenticated, estadisticasRoutes);
-router.use('/establecimientos', ensureAuthenticated, authorizeRole('dueño'), establecimientosRoutes);
-router.use('/canchas', ensureAuthenticated, authorizeRole('dueño'), canchasRoutes);
+router.use('/establecimientos', ensureAuthenticated, authorizeRole('dueño', 'admin'), establecimientosRoutes);
+router.use('/canchas', ensureAuthenticated, authorizeRole('dueño', 'admin'), canchasRoutes);
 
 module.exports = router;

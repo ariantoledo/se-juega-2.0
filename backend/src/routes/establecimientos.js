@@ -52,13 +52,22 @@ router.get('/', establecimientosController.getEstablecimientos);
  *       201:
  *         description: Establecimiento creado
  */
-router.post('/', ensureAuthenticated, authorizeRole('dueño', 'admin'), establecimientosController.createEstablecimiento);
+router.post(
+  '/',
+  ensureAuthenticated,
+  (req, res, next) => {
+    console.log('Usuario en sesión:', req.user);
+    next();
+  },
+  authorizeRole('dueño', 'admin'),
+  establecimientosController.createEstablecimiento
+);
 
 /**
  * @swagger
  * /establecimientos/{id}:
  *   put:
- *     summary: Actualiza un establecimiento existente
+ *     summary: Actualiza un establecimiento existente (dueño/admin)
  *     tags: [Establecimientos]
  *     parameters:
  *       - in: path
@@ -78,7 +87,16 @@ router.post('/', ensureAuthenticated, authorizeRole('dueño', 'admin'), establec
  *       404:
  *         description: Establecimiento no encontrado
  */
-router.put('/:id', ensureAuthenticated, authorizeRole('dueño', 'admin'), establecimientosController.updateEstablecimiento);
+router.put(
+  '/:id',
+  ensureAuthenticated,
+  (req, res, next) => {
+    console.log('Usuario en sesión:', req.user);
+    next();
+  },
+  authorizeRole('dueño', 'admin'),
+  establecimientosController.updateEstablecimiento
+);
 
 /**
  * @swagger
@@ -98,6 +116,15 @@ router.put('/:id', ensureAuthenticated, authorizeRole('dueño', 'admin'), establ
  *       404:
  *         description: Establecimiento no encontrado
  */
-router.delete('/:id', ensureAuthenticated, authorizeRole('dueño', 'admin'), establecimientosController.deleteEstablecimiento);
+router.delete(
+  '/:id',
+  ensureAuthenticated,
+  (req, res, next) => {
+    console.log('Usuario en sesión:', req.user);
+    next();
+  },
+  authorizeRole('dueño', 'admin'),
+  establecimientosController.deleteEstablecimiento
+);
 
 module.exports = router;

@@ -4,10 +4,14 @@ function authorizeRole(...allowedRoles) {
       return res.status(401).json({ error: 'No autenticado' });
     }
 
-    const userRole = req.user.rol; // asegúrate que la columna en DB sea "rol"
-    console.log('Rol del usuario en sesión:', userRole);
+    // Normaliza el rol: acepta rol o role, quita espacios y pasa a minúsculas
+    const userRole = (req.user.rol || req.user.role || '').toString().trim().toLowerCase();
+    const normalizedAllowed = allowedRoles.map(r => r.toLowerCase());
 
-    if (!allowedRoles.includes(userRole)) {
+    console.log('Rol detectado:', userRole);
+    console.log('Roles permitidos:', normalizedAllowed);
+
+    if (!normalizedAllowed.includes(userRole)) {
       return res.status(403).json({ error: 'No tienes permisos para esta acción' });
     }
 
